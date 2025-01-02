@@ -1,74 +1,69 @@
+import { Alert, Button, Form, Input,message } from 'antd';
 import './App.css';
-import {  Table } from 'antd';
+import { useState } from 'react';
 
 function App() {
-const data =[{
-  name:'Name 1',
-  age:21,
-  address :'Adress 1',
-  key : '1'
-},
-{name:'Name 2',
-  age:22,
-  address :'Adress 2',
-  key : '2'
-},
-{
-  name:'Name 3',
-  age:16,
-  address :'Adress 3',
-  key : '3'
+  const[showAlert,setShowAlert] = useState(false)
 
-},
-{
-  name:'Name 3',
-  age:25,
-  address :'Adress 3',
-  key : '4'
+  const onFinish = (values) => {
+    console.log('Form Submitted:', values);
+    setTimeout(()=>{
+      setShowAlert(true)
 
-}]
+      // message.success("login sucess")
+      // message.warning("Login Pending")
+      // message.error("Login Filed")
+    },2000)
+  };
 
-const columns = [{
-  title : () =>    <p style ={{color : 'red'}}>Name</p>,
-  dataIndex : 'name',
-  key : 'name',
-  sorter : (a,b) => a.name.localeCompare(b.name), 
-  render : name =>{
-    return <a href="#">{name}</a>
-  },
-},
-{
-  title : 'Age',
-  dataIndex : 'age',
-  key : 'age',
-  sorter :(a,b) =>a.age - b.age
-},
-{
-  title : 'address',
-  dataIndex : 'address',
-  key : 'address',
-},
-{
- title : 'Adult',
- key : 'key',
- render : adult =>{
- return <p>{adult.age > 18 ? "Adult" : "Not-Adult"} </p>
-}
-}
-
-]
-
+  const onFinishFailed = (errorInfo) => {
+    console.log('Form Submission Failed:', errorInfo);
+  };
 
   return (
     <div className="App">
-     <header className='App-header'>
-      <Table
-      columns={columns}
-      dataSource={data}
+      <header className="App-header">
+        {showAlert && 
+        <Alert message="Login Success"
+         type="success"
+         description="The login was sucesfull" 
+         closable/>}
+        
+        <Form
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          layout="vertical"
         >
+         
+         <Form.Item
+            label="Name"
+            name="name"
+            // rules={[
+            //   { required: true, message: 'Please enter your name!' },
+            //   { min: 3, message: 'Name must be at least 3 characters long!' },
+            // ]}
+          >
+            <Input placeholder="Enter your name" />
+          </Form.Item>
 
-      </Table>
-     </header>
+          <Form.Item
+            label="Password"
+            name="password"
+            // rules={[
+            //   { required: true, message: 'Please enter your password!' },
+            //   { min: 6, message: 'Password must be at least 6 characters long!' },
+            // ]}
+          >
+            <Input.Password placeholder="Enter your password" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button block type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </header>
     </div>
   );
 }
