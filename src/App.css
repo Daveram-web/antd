@@ -1,4 +1,21 @@
-.my-button{
-  color: blue;
-  background-color: red;
+.App-header{
+  height: 300px;
+  width: 500px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.App{
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  
 }
