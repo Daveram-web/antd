@@ -35,7 +35,7 @@ function App() {
         <Tabs
           defaultActiveKey='3'
         >
-          <Tabs.TabPane tab="Tab 1" key="tab 1">
+          <Tabs.TabPane tab="Tab 1" key="tab 1" disabled>
             <div>This is Tab 1</div>
           </Tabs.TabPane>
           <Tabs.TabPane tab="Tab 2" key="tab2">
@@ -96,14 +96,9 @@ function App() {
           defaultActiveKey='1'
           type='editable-card'
           onEdit={onEdit}
-          
         >
           {tabList.map((tabInfo) => (
-
-            <Tabs.TabPane tab={tabInfo.tab} key={tabInfo.key}
-            >
-
-
+            <Tabs.TabPane tab={tabInfo.tab} key={tabInfo.key}>
               <div>This is {tabInfo.tab}</div>
             </Tabs.TabPane>
           ))}
