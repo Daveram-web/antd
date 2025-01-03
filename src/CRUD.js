@@ -1,99 +1,133 @@
-import React, { useState } from 'react';
-import { Table, Button,  Input, Form } from 'antd';
-import {EditTwoTone,DeleteTwoTone} from '@ant-design/icons';
+import "./App.css";
+import { Button, Table, Modal, Input, Form } from "antd";
+import { useState } from "react";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-import './App.css';
-
-const CRUD = () => {
-  const [values, setValues] = useState([
-    { id: 1, name: 'Name 1', email: 'Email 1', add: 'Add 1' },
-    { id: 2, name: 'Name 2', email: 'Email 2', add: 'Add 2' },
-    { id: 3, name: 'Name 3', email: 'Email 3', add: 'Add 3' },
-    { id: 4, name: 'Name 4', email: 'Email 4', add: 'Add 4' },
-    { id: 5, name: 'Name 5', email: 'Email 5', add: 'Add 5' },
-    { id: 6, name: 'Name 6', email: 'Email 6', add: 'Add 6' },
+function App() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [dataSource, setDataSource] = useState([
+    { id: 1, name: "John", email: "john@gmail.com", address: "John Address" },
+    { id: 2, name: "David", email: "david@gmail.com", address: "David Address" },
+    { id: 3, name: "James", email: "james@gmail.com", address: "James Address" },
+    { id: 4, name: "Sam", email: "sam@gmail.com", address: "Sam Address" },
   ]);
 
-  const [form] = Form.useForm();  
+  const [form] = Form.useForm();
 
   const columns = [
+    { key: "1", title: "ID", dataIndex: "id" },
+    { key: "2", title: "Name", dataIndex: "name" },
+    { key: "3", title: "Email", dataIndex: "email" },
+    { key: "4", title: "Address", dataIndex: "address" },
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Address',
-      dataIndex: 'add',
-      key: 'add',
-    },
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-      render: (_, record) => {
-        return (
-          <>
-            <EditTwoTone />
-            <DeleteTwoTone
-              onClick={() => handleDelete(record)} 
-              style={{ margin: 12, cursor: 'pointer' }}
-            />
-          </>
-      )}
-
+      key: "5",
+      title: "Actions",
+      render: (record) => (
+        <>
+          <EditOutlined
+            onClick={() => {
+              onEditStudent(record);
+            }}
+            style={{ marginRight: 12, cursor: "pointer" }}
+          />
+          <DeleteOutlined
+            onClick={() => {
+              onDeleteStudent(record);
+            }}
+            style={{ color: "red", cursor: "pointer" }}
+          />
+        </>
+      ),
     },
   ];
 
-  const handleAddUser = (newUser) => {
-    setValues((prevValues) => [
-      ...prevValues,
-      { ...newUser, id: prevValues.length + 1 }, 
-    ]);
-    form.resetFields();  
+  const onAddStudent = () => {
+    setEditingStudent(null); // Indicates adding a new user
+    setIsVisible(true);
+    form.resetFields(); // Clear the form
   };
 
-  const handleDelete = (record) => {
-    setValues((prev) => {
-      return prev.filter(student => student.id !== record.id);
+  const onEditStudent = (record) => {
+    setEditingStudent(record); // Indicates editing a user
+    setIsVisible(true);
+    form.setFieldsValue(record); // Populate the form with selected record data
+  };
+
+  const onDeleteStudent = (record) => {
+    Modal.confirm({
+      title: "Are you sure, you want to delete this student record?",
+      okText: "Yes",
+      okType: "danger",
+      onOk: () => {
+        setDataSource((prev) => prev.filter((student) => student.id !== record.id));
+      },
     });
   };
-  
 
+  const handleFormSubmit = (values) => {
+    if (editingStudent) {
+      setDataSource((prev) =>
+        prev.map((student) =>
+          student.id === editingStudent.id ? { ...editingStudent, ...values } : student
+        )
+      );
+    } else {
+      const newStudent = {
+        ...values,
+        id: dataSource.length ? dataSource[dataSource.length - 1].id + 1 : 1,
+      };
+      setDataSource((prev) => [...prev, newStudent]);
+    }
+    setIsVisible(false);
+    setEditingStudent(null);
+    form.resetFields();
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <Form form={form} onFinish={handleAddUser} layout="inline" style={{ marginBottom: '20px' }}>
-          <Form.Item label="Name" name="name" >
-            <Input placeholder="Enter name" />
-          </Form.Item>
-          <Form.Item label="Email" name="email" >
-            <Input placeholder="Enter email" />
-          </Form.Item>
-          <Form.Item label="Address" name="add" >
-            <Input placeholder="Enter address" />
-          </Form.Item>
-          <Form.Item>
-            <Button block type="primary" htmlType="submit">
-              Add User
-            </Button>
-          </Form.Item>
-        </Form> 
-        <Table dataSource={values} columns={columns} rowKey="id" />
+        <Button onClick={onAddStudent} style={{ marginBottom: 20 }}>
+          Add New Student
+        </Button>
+        <Table columns={columns} dataSource={dataSource} rowKey="id" />
+        <Modal
+          title={editingStudent ? "Edit Student" : "Add Student"}
+          open={isVisible}
+          okText={editingStudent ? "Save Changes" : "Add Student"}
+          onCancel={() => {
+            setIsVisible(false);
+            setEditingStudent(null);
+          }}
+          onOk={() => form.submit()}
+        >
+          <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
+            <Form.Item
+              label="Name"
+              name="name"
+              rules={[{ required: true, message: "Please enter the name" }]}
+            >
+              <Input placeholder="Enter name" />
+            </Form.Item>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[{ required: true, message: "Please enter the email" }]}
+            >
+              <Input placeholder="Enter email" />
+            </Form.Item>
+            <Form.Item
+              label="Address"
+              name="address"
+              rules={[{ required: true, message: "Please enter the address" }]}
+            >
+              <Input placeholder="Enter address" />
+            </Form.Item>
+          </Form>
+        </Modal>
       </header>
     </div>
   );
-};
+}
 
-export default CRUD;
+export default App;
